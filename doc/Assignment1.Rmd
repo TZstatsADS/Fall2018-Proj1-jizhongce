@@ -1,0 +1,8 @@
+First we need to read the data
+
+```{r}
+library(tidyverse)
+read_csv('https://raw.githubusercontent.com/rit-public/HappyDB/master/happydb/data/cleaned_hm.csv')
+hmdata <- read_csv("../output/processed_moments.csv")
+
+```
