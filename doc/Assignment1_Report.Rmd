@@ -64,9 +64,16 @@ Happy_Moment_Senselabel_Data <- Happy_Moment_Senselabel_Data %>% filter(gender %
 ```
 
 
-First we take look at the frequency of the word for different group of people
+## Word frequency in happy moment
 
-```{r Word_Frequency, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+In order to find out what may cause the happy for different group of people, we use the happy moment data from [HappyDB](https://rit-public.github.io/HappyDB/), and also use the data which has been pre-processed in file [Text_Processing.Rmd](./Text_Processing.Rmd). In the Text_Processing file, The happy monment text has been cleaned and left some major words. Then we also need to use the data demographic.csv in data folder which contain the demographic data for each happy moment. Then we will compare the word frequency for different group of people according to the demographic data.
+
+
+### Gender: Female vs Male
+
+To compare what's the different causes among the female and male, we will create word cloud( only show top 20 frequency word) for both **Female** and **Male**. 
+
+```{r Word_Frequency1, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
 # Female VS Male
 
 Female_Word_Freq <- filter(Happy_Moment_Demographic_Data, gender == "f") %>% unnest_tokens(word, text)
@@ -81,6 +88,19 @@ wordcloud2(Male_Word_Freq[1:20,], size = 0.3)
 
 wordcloud2(Female_Word_Freq[1:20,], size = 0.3)
 
+```
+
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Male_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Female_Word_Freq_Word_Cloud.png)
+
+In the word frequency cloud, we can find that The top three word which means the word has highest frequency for both Female and Male is **time**, **day** and **friend**. Then for the male, some words like **girlfriend**, **wife**, **game**, **bought**, **watched** will make them happy. The reason may be for the male, when they did something with their girlfriend or wife will make them happy or when they watch some shows or play some games will also let them have joy. As for the female, word **daughter**, **husband**, **son** and **family** will make them happy, so maybe female will have fun when they spend some times with their family.
+
+
+### Gender: Married vs Single
+
+Then we are also take look at the difference between **Married People** and **Signle Person**
+
+```{r Word_Frequency2, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+
 # Single VS Married
 
 Single_Word_Freq <- filter(Happy_Moment_Demographic_Data, marital == "single") %>% unnest_tokens(word, text)
@@ -94,6 +114,19 @@ Married_Word_Freq <- Married_Word_Freq %>% dplyr::count(word, sort = TRUE)
 wordcloud2(Single_Word_Freq[1:20,], size = 0.3)
 
 wordcloud2(Married_Word_Freq[1:20,], size = 0.3)
+
+```
+
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Married_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Single_Word_Freq_Word_Cloud.png)
+
+In both word frequency cloud, we find that there are many difference between married people and single person. For the married people, the most frequency word including **time**, **family**, **love**, **wife**, **husband**, **son**, **daughter** which are mostly related to the family so that we may can conclude that people who get married will have most happy moment with their family. While for people who did not get married, the most frequency words including **friend**, **watched**, **game**, **bought** are more likely can be described as less family stuff since watched something or games can also be done with their friends.
+
+
+### Gender: Parenthood vs No Parenthood
+
+The difference between **Parenthood People** and **No Parenthood people** are also very big.
+
+```{r Word_Frequency3, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
 
 # parenthood VS no Parenthood
 
@@ -111,17 +144,20 @@ wordcloud2(No_Parenthood_Word_Freq[1:20,], size = 0.3)
 
 ```
 
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Parenthood_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/No_Parenthood_Word_Freq_Word_Cloud.png)
+
+Compared with both word frequency cloud, we can find that it is quite similiar to the difference between married people and not married people. For the parenthood people, the high frequency word such as **wife**, **husband**, **family** and so on are mostly related to the family so maybe they have joy when they spend time with their family. While for the no parenthood people, it is similiar to the no married people who may enjoy their life with their friends or doing something that they are interested in.
 
 
+## Individual(Family Related) Activity or Group(Social) Activity
 
+After exploring the word frequency cloud for different group of people, we find that people have fun either with family(including themselves) or with other people(like friends or other people). So we want to compare the individual/family related activity or group(social) activity to find out which activity are most likely will bring happy moment for different people.
 
+Here we need to load the senselabel data for each happy moment from senselabel.csv in the data folder. Then we cluster the happy moment into two different groups by detecting the [personal pronouns](https://en.wikipedia.org/wiki/Personal_pronoun) in the original text. Here we cluster that if the original text only includs the word **i**, **my**, **you**, **me**, **yours**, **myself**, **your**, **yourself**, then we think the happy moment is individual activity and if the original text includs the word **his**, **he**, **she**, **her**, **we**, **our**, **their**, **they**, **them**, **themselves**, **us**, **himself**, **herself**, **ourself**, **him**, then we think the happy moment is related to the group activity. 
 
-
-Individual VS Group
-
-Next we take look at the group activity or individual activity. This can be done in the data set Happy_Moment_Senselabel_Data. There is a column which will contain the POS data which contain the PRON indicates the personal pronouns.
 
 ```{r Individual_OR_Group, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+set.seed(1)
 Happy_Moment_Senselabel_Data_Pron <- Happy_Moment_Senselabel_Data[Happy_Moment_Senselabel_Data$POS == "PRON",]
 
 # Next we need to create two list manually, including individual PRON and group PRON
@@ -182,23 +218,58 @@ Happy_Moment_New_Demographic_Data <- hm_data %>% inner_join(demographic_data, by
 
 Happy_Moment_New_Demographic_Data$Group_OR_Individual <- as.character(Happy_Moment_New_Demographic_Data$Group_OR_Individual)
 
-ggplot(Happy_Moment_New_Demographic_Data, aes(marital)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
+# select same number married and single 
 
-ggplot(Happy_Moment_New_Demographic_Data, aes(gender)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
+Happy_Moment_Married_New_Demographic_Data <- Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$marital == "married",][sample(nrow(Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$marital == "married",]), 40000) ,]
 
-ggplot(Happy_Moment_New_Demographic_Data, aes(parenthood)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
+Happy_Moment_Single_New_Demographic_Data <- Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$marital == "single",][sample(nrow(Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$marital == "single",]), 40000) ,]
+
+Happy_Moment_Marital_New_Demographic_Data <- rbind(Happy_Moment_Married_New_Demographic_Data, Happy_Moment_Single_New_Demographic_Data)
+
+ggplot(Happy_Moment_Marital_New_Demographic_Data, aes(marital)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
+
+
+# select same number female and male 
+
+Happy_Moment_Male_New_Demographic_Data <- Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$gender == "m",][sample(nrow(Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$gender == "m",]), 38000) ,]
+
+Happy_Moment_female_New_Demographic_Data <- Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$gender == "f",][sample(nrow(Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$gender == "f",]), 38000) ,]
+
+Happy_Moment_Gender_New_Demographic_Data <- rbind(Happy_Moment_Male_New_Demographic_Data, Happy_Moment_female_New_Demographic_Data)
+
+
+ggplot(Happy_Moment_Gender_New_Demographic_Data, aes(gender)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
+
+
+
+# select same number y and n 
+
+Happy_Moment_Parenthood_New_Demographic_Data <- Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$parenthood == "y",][sample(nrow(Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$parenthood == "y",]), 35000) ,]
+
+Happy_Moment_No_Parenthood_New_Demographic_Data <- Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$parenthood == "n",][sample(nrow(Happy_Moment_New_Demographic_Data[Happy_Moment_New_Demographic_Data$parenthood == "n",]), 35000) ,]
+
+Happy_Moment_parenthood_New_Demographic_Data <- rbind(Happy_Moment_Parenthood_New_Demographic_Data, Happy_Moment_No_Parenthood_New_Demographic_Data)
+
+
+ggplot(Happy_Moment_parenthood_New_Demographic_Data, aes(parenthood)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
 
 
 ```
 
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Gender_Group_Individual.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Marital_Group_Individual.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Parenthood_Group_Individual.png)
+
+According to the bar plot above, we find that for both male, female, married, not married, parenthood or not parenthood people, the individual/family related activities are more likely will cause the happy moment for them. While between married and not married people, according to the plot, we can find that people who get married are more likey enjoy the group activity than people who does not get married. While for the female and male, we can conclude from the plot that female are more likey enjoy the group activity than male. And for parenthood or no parenthood people, the parenthood people are more likely enjoy the group activity than no parenthood people.
 
 
-Different in Category heat map
+
+## Text Category
+
+After we exploring the data, people have fun when they are doing or enjoying different kind of stuff so we will take look at the category for each happy moment and find which category will most likely cause the happy moment for different group of people.
 
 ```{r Category_Heat_Map, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
 # Here we create a function which we can use to create different matrix for heat map
 # Here we do the matrix for gender
-Happy_Moment_Heat_Map_gender_Data <- Happy_Moment_New_Demographic_Data[, c("gender","predicted_category")]
+Happy_Moment_Heat_Map_gender_Data <- Happy_Moment_Gender_New_Demographic_Data[, c("gender","predicted_category")]
 
 Happy_Moment_Gender_Counts <- ddply(Happy_Moment_Heat_Map_gender_Data, .(Happy_Moment_Heat_Map_gender_Data$gender, Happy_Moment_Heat_Map_gender_Data$predicted_category), nrow)
   
@@ -230,8 +301,8 @@ d3heatmap(Happy_Moment_Heap_Map_Gender_Matrix)
 
 
 
-# Here we do the matrix for gender
-Happy_Moment_Heat_Map_marital_Data <- Happy_Moment_New_Demographic_Data[, c("marital","predicted_category")]
+# Here we do the matrix for marital
+Happy_Moment_Heat_Map_marital_Data <- Happy_Moment_Marital_New_Demographic_Data[, c("marital","predicted_category")]
 
 Happy_Moment_marital_Counts <- ddply(Happy_Moment_Heat_Map_marital_Data, .(Happy_Moment_Heat_Map_marital_Data$marital, Happy_Moment_Heat_Map_marital_Data$predicted_category), nrow)
   
@@ -263,7 +334,7 @@ d3heatmap(Happy_Moment_Heap_Map_Marital_Matrix)
 
 
 # Here we do the matrix for parenthood
-Happy_Moment_Heat_Map_parenthood_Data <- Happy_Moment_New_Demographic_Data[, c("parenthood","predicted_category")]
+Happy_Moment_Heat_Map_parenthood_Data <- Happy_Moment_parenthood_New_Demographic_Data[, c("parenthood","predicted_category")]
 
 Happy_Moment_parenthood_Counts <- ddply(Happy_Moment_Heat_Map_parenthood_Data, .(Happy_Moment_Heat_Map_parenthood_Data$parenthood, Happy_Moment_Heat_Map_parenthood_Data$predicted_category), nrow)
   
@@ -297,7 +368,16 @@ d3heatmap(Happy_Moment_Heap_Map_Parenthood_Matrix)
 ```
 
 
-Then take look at the verb or noun
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Gender_Heatmap.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Marital_Heatmap.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Parenthood_Heatmap.png)
+
+We create heatmap for the different category for different group of people. It is obvious that the category **affection**, **achievement** and **enjoy the moment** are top three category which will most likely bring the happy moment for people. Between female and male, we can find the **affection** category moment are most likely bring the happy moment to the female, while for the male the **achievement** category moment are most likely bring the happy moment to the female. For married and not married, the **affection** category moment are most likely bring the happy moment to the people who get married and the **achievement** category moment are most likely bring the happy moment to the people who is single. For the parenthood people, they enjoy the **affection** more than others, while for no parenthood people, the **achievement** category moment will bring more happy moment.
+
+
+
+## VERB and NOUN
+
+After we take look at the category of each moment, we also find that different kind of action or stuff will also bring happy moment to people, so we analysis the different verb and noun in each text and count which kind of verb or noun have high frequency among all happy moment.
+
 
 ```{r Verb_Noun, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
 # verb supersense label
@@ -310,49 +390,40 @@ Happy_Moment_Super_Sense_Verb_Data <- Happy_Moment_Super_Sense_Data[Happy_Moment
 # Then take the noun
 Happy_Moment_Super_Sense_Noun_Data <- Happy_Moment_Super_Sense_Data[Happy_Moment_Super_Sense_Data$POS == "NOUN", ]
 
-# This for gender
-Happy_Moment_Super_Sense_Verb_Gender_Counts <- ddply(Happy_Moment_Super_Sense_Verb_Data, .(Happy_Moment_Super_Sense_Verb_Data$gender, Happy_Moment_Super_Sense_Verb_Data$supersenseLabel), nrow)
+Happy_Moment_Super_Sense_Verb_Counts <- ddply(Happy_Moment_Super_Sense_Verb_Data, .(Happy_Moment_Super_Sense_Verb_Data$supersenseLabel), nrow)
 
-colnames(Happy_Moment_Super_Sense_Verb_Gender_Counts) <- c("gender", "supersenseLabel", "count")
+colnames(Happy_Moment_Super_Sense_Verb_Counts) <- c("supersenseLabel", "count")
 
-Happy_Moment_Super_Sense_Noun_Gender_Counts <- ddply(Happy_Moment_Super_Sense_Noun_Data, .(Happy_Moment_Super_Sense_Noun_Data$gender, Happy_Moment_Super_Sense_Noun_Data$supersenseLabel), nrow)
+Happy_Moment_Super_Sense_Noun_Counts <- ddply(Happy_Moment_Super_Sense_Noun_Data, .(Happy_Moment_Super_Sense_Noun_Data$supersenseLabel), nrow)
 
-colnames(Happy_Moment_Super_Sense_Noun_Gender_Counts) <- c("gender", "supersenseLabel", "count")
+colnames(Happy_Moment_Super_Sense_Noun_Counts) <- c("supersenseLabel", "count")
 
-ggplot(Happy_Moment_Super_Sense_Verb_Gender_Counts, aes(x = gender, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
+ggplot(Happy_Moment_Super_Sense_Verb_Counts, aes(x = supersenseLabel, y = count, fill=supersenseLabel, label = supersenseLabel)) + geom_col() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
 
-ggplot(Happy_Moment_Super_Sense_Noun_Gender_Counts, aes(x = gender, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
+ggplot(Happy_Moment_Super_Sense_Noun_Counts, aes(x = supersenseLabel, y = count, fill=supersenseLabel, label = supersenseLabel)) + geom_col() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
 
-
-
-# This for marital
-Happy_Moment_Super_Sense_Verb_Marital_Counts <- ddply(Happy_Moment_Super_Sense_Verb_Data, .(Happy_Moment_Super_Sense_Verb_Data$marital, Happy_Moment_Super_Sense_Verb_Data$supersenseLabel), nrow)
-
-colnames(Happy_Moment_Super_Sense_Verb_Marital_Counts) <- c("marital", "supersenseLabel", "count")
-
-Happy_Moment_Super_Sense_Noun_Marital_Counts <- ddply(Happy_Moment_Super_Sense_Noun_Data, .(Happy_Moment_Super_Sense_Noun_Data$marital, Happy_Moment_Super_Sense_Noun_Data$supersenseLabel), nrow)
-
-colnames(Happy_Moment_Super_Sense_Noun_Marital_Counts) <- c("marital", "supersenseLabel", "count")
-
-ggplot(Happy_Moment_Super_Sense_Verb_Marital_Counts, aes(x = marital, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
-
-ggplot(Happy_Moment_Super_Sense_Noun_Marital_Counts, aes(x = marital, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
-
-
-
-# This for parenthood Parenthood
-Happy_Moment_Super_Sense_Verb_Parenthood_Counts <- ddply(Happy_Moment_Super_Sense_Verb_Data, .(Happy_Moment_Super_Sense_Verb_Data$parenthood, Happy_Moment_Super_Sense_Verb_Data$supersenseLabel), nrow)
-
-colnames(Happy_Moment_Super_Sense_Verb_Parenthood_Counts) <- c("parenthood", "supersenseLabel", "count")
-
-Happy_Moment_Super_Sense_Noun_Parenthood_Counts <- ddply(Happy_Moment_Super_Sense_Noun_Data, .(Happy_Moment_Super_Sense_Noun_Data$parenthood, Happy_Moment_Super_Sense_Noun_Data$supersenseLabel), nrow)
-
-colnames(Happy_Moment_Super_Sense_Noun_Parenthood_Counts) <- c("parenthood", "supersenseLabel", "count")
-
-ggplot(Happy_Moment_Super_Sense_Verb_Parenthood_Counts, aes(x = parenthood, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
-
-ggplot(Happy_Moment_Super_Sense_Noun_Parenthood_Counts, aes(x = parenthood, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
 
 ```
+
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/VERB.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/NOUN.png)
+
+
+According to the plot, we find that the verb which represent the stative has highest frequency which means that the moment which contain stative change are most likely bring the happy moment to people. And also the social verb or motion verb also are more likely to cause the happy moment. For noun, the time and person have high frequency. Also we can find that the noun which represent artifact, act, communication, food and group also have very high frequency which means that the moment which have some artifact noun, food, communication noun are more likely to cause the happy moment.
+
+
+
+
+## Summary
+
+After analyzing the different happy moment in different group, we have the following results.
+
++ Friends are most likely to bring the happy moments to people . 
+
++ Have Individual or Family related activities may also cause the happy moments in life.
+
++ To achieve more achievements or change in the affection will also cause the happy moments.
+
++ Some artifact, food noun or social, motion verb will cause the happy moments.
+
 
 
