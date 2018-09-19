@@ -9,10 +9,14 @@ This is the first and only *individual* (as opposed to *team*) this semester.
 
 Term: Fall 2018
 
-+ Projec title: Lorem ipsum dolor sit amet
++ Projec title: Happy Moment Analysis/ What cause the happy moment
 + This project is conducted by Zhongce Ji
 
-+ Project summary: [a short summary] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
++ Project summary: The project focus on analyzing the happy moment in [HappyDB](https://rit-public.github.io/HappyDB/) to find out which will most likely cause the happy moment in different group of people. The analysis is done by four part, Word frequency, Group or Individual Activity, Text Category and Verb or Noun in Text
+
+### [Project Report](doc/Assignment1_Report.html)
+
+### [Project Code](doc/Assignment1_Report.Rmd)
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 

@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 <center> <h1>Happy Monment Analysis</h1> </center>
-<center> <h2>Word frequency between different group of people. Group or Individual Activity. Category Heatmap. Difference between Verb and Noun</h2> </center>
+<center> <h2>Word frequency between different group of people. Group or Individual Activity. Category Heatmap. Verb and Noun</h2> </center>
 
 <center>By Zhongce Ji</center>
 
