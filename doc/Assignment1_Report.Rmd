@@ -14,18 +14,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <center>By Zhongce Ji</center>
 
-\newline
-\newline
-\newline
 
-
-![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Happy_Moment.png)
+![](../figs/Happy_Moment.png)
 
 There are many things will make people happy at specific moment in their life. Different group of people will have different perspectives of the happy moments, so for different people the causes of happy moment also differs in some way. So it is interesting to find out what will cause the people happy among different group of people, and let's compare how they are different from each other!
 
-\newline
-\newline
-\newline
+
 
 ```{r Loading_Package, echo=FALSE, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
 # Here Load packages
@@ -90,7 +84,7 @@ wordcloud2(Female_Word_Freq[1:20,], size = 0.3)
 
 ```
 
-![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Male_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Female_Word_Freq_Word_Cloud.png)
+![](../figs/Male_Word_Freq_Word_Cloud.png)![](../figs/Female_Word_Freq_Word_Cloud.png)
 
 In the word frequency cloud, we can find that The top three word which means the word has highest frequency for both Female and Male is **time**, **day** and **friend**. Then for the male, some words like **girlfriend**, **wife**, **game**, **bought**, **watched** will make them happy. The reason may be for the male, when they did something with their girlfriend or wife will make them happy or when they watch some shows or play some games will also let them have joy. As for the female, word **daughter**, **husband**, **son** and **family** will make them happy, so maybe female will have fun when they spend some times with their family.
 
@@ -117,7 +111,7 @@ wordcloud2(Married_Word_Freq[1:20,], size = 0.3)
 
 ```
 
-![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Married_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Single_Word_Freq_Word_Cloud.png)
+![](../figs/Married_Word_Freq_Word_Cloud.png)![](../figs/Single_Word_Freq_Word_Cloud.png)
 
 In both word frequency cloud, we find that there are many difference between married people and single person. For the married people, the most frequency word including **time**, **family**, **love**, **wife**, **husband**, **son**, **daughter** which are mostly related to the family so that we may can conclude that people who get married will have most happy moment with their family. While for people who did not get married, the most frequency words including **friend**, **watched**, **game**, **bought** are more likely can be described as less family stuff since watched something or games can also be done with their friends.
 
@@ -144,7 +138,7 @@ wordcloud2(No_Parenthood_Word_Freq[1:20,], size = 0.3)
 
 ```
 
-![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Parenthood_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/No_Parenthood_Word_Freq_Word_Cloud.png)
+![](../figs/Parenthood_Word_Freq_Word_Cloud.png)![](../figs/No_Parenthood_Word_Freq_Word_Cloud.png)
 
 Compared with both word frequency cloud, we can find that it is quite similiar to the difference between married people and not married people. For the parenthood people, the high frequency word such as **wife**, **husband**, **family** and so on are mostly related to the family so maybe they have joy when they spend time with their family. While for the no parenthood people, it is similiar to the no married people who may enjoy their life with their friends or doing something that they are interested in.
 
@@ -256,7 +250,7 @@ ggplot(Happy_Moment_parenthood_New_Demographic_Data, aes(parenthood)) + geom_bar
 
 ```
 
-![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Gender_Group_Individual.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Marital_Group_Individual.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Parenthood_Group_Individual.png)
+![](../figs/Gender_Group_Individual.png)![](../figs/Marital_Group_Individual.png)![](../figs/Parenthood_Group_Individual.png)
 
 According to the bar plot above, we find that for both male, female, married, not married, parenthood or not parenthood people, the individual/family related activities are more likely will cause the happy moment for them. While between married and not married people, according to the plot, we can find that people who get married are more likey enjoy the group activity than people who does not get married. While for the female and male, we can conclude from the plot that female are more likey enjoy the group activity than male. And for parenthood or no parenthood people, the parenthood people are more likely enjoy the group activity than no parenthood people.
 
@@ -368,7 +362,7 @@ d3heatmap(Happy_Moment_Heap_Map_Parenthood_Matrix)
 ```
 
 
-![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Gender_Heatmap.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Marital_Heatmap.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Parenthood_Heatmap.png)
+![](../figs/Gender_Heatmap.png)![](../figs/Marital_Heatmap.png)![](../figs/Parenthood_Heatmap.png)
 
 We create heatmap for the different category for different group of people. It is obvious that the category **affection**, **achievement** and **enjoy the moment** are top three category which will most likely bring the happy moment for people. Between female and male, we can find the **affection** category moment are most likely bring the happy moment to the female, while for the male the **achievement** category moment are most likely bring the happy moment to the female. For married and not married, the **affection** category moment are most likely bring the happy moment to the people who get married and the **achievement** category moment are most likely bring the happy moment to the people who is single. For the parenthood people, they enjoy the **affection** more than others, while for no parenthood people, the **achievement** category moment will bring more happy moment.
 
@@ -405,10 +399,10 @@ ggplot(Happy_Moment_Super_Sense_Noun_Counts, aes(x = supersenseLabel, y = count,
 
 ```
 
-![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/VERB.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/NOUN.png)
+![](../figs/VERB.png)![](../figs/NOUN.png)
 
 
-According to the plot, we find that the verb which represent the stative has highest frequency which means that the moment which contain stative change are most likely bring the happy moment to people. And also the social verb or motion verb also are more likely to cause the happy moment. For noun, the time and person have high frequency. Also we can find that the noun which represent artifact, act, communication, food and group also have very high frequency which means that the moment which have some artifact noun, food, communication noun are more likely to cause the happy moment.
+According to the plot, we find that the verb which represent the stative has highest frequency which means that the moment which contain **stative** change are most likely bring the happy moment to people. And also the social verb or motion verb also are more likely to cause the happy moment. For noun, the **time** and **person** have high frequency which means that in a certain time a specific person will make people happy. Also we can find that the noun which represent **artifact**, **act**, **communication**, **food** and **group** also have very high frequency which means that the moment which have some **artifact**, **food**, **communication** are more likely to cause the happy moment.
 
 
 
