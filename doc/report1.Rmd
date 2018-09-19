@@ -1,0 +1,78 @@
+---
+output: html_document
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<center> <h1>Happy Monment Analysis</h1> </center>
+<center> <h2>Word frequency between different group of people. Group or Individual Activity. Category Heatmap. Difference between Verb and Noun</h2> </center>
+
+<center>By Zhongce Ji</center>
+
+\newline 
+\newline 
+\newline
+
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Happy_Moment.png)
+
+There are many things will make people happy at specific moment in their life. Different group of people will have different perspectives of the happy moments, so for different people the causes of happy moment also differs in some way. So it is interesting to find out what will cause the people happy among different group of people, and let's compare how they are different from each other!
+
+\newline
+\newline
+\newline
+
+## Word frequency in happy moment
+
+In order to find out what may cause the happy for different group of people, we use the happy moment data from [HappyDB](https://rit-public.github.io/HappyDB/), and also use the data which has been pre-processed in file [Text_Processing.Rmd](./Text_Processing.Rmd). In the Text_Processing file, The happy monment text has been cleaned and left some major words. Then we also need to use the data demographic.csv in data folder which contain the demographic data for each happy moment. Then we will compare the word frequency for different group of people according to the demographic data.
+
+### Gender: Female vs Male
+
+To compare what's the different causes among the female and male, we will create word cloud( only show top 20 frequency word) for both **Female** and **Male**. 
+
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Male_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Female_Word_Freq_Word_Cloud.png)
+
+In the word frequency cloud, we can find that The top three word which means the word has highest frequency for both Female and Male is **time**, **day** and **friend**. Then for the male, some words like **girlfriend**, **wife**, **game**, **bought**, **watched** will make them happy. The reason may be for the male, when they did something with their girlfriend or wife will make them happy or when they watch some shows or play some games will also let them have joy. As for the female, word **daughter**, **husband**, **son** and **family** will make them happy, so maybe female will have fun when they spend some times with their family.
+
+
+### Gender: Married vs Single
+
+Then we are also take look at the difference between **Married People** and **Signle Person**
+
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Married_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Single_Word_Freq_Word_Cloud.png)
+
+In both word frequency cloud, we find that there are many difference between married people and single person. For the married people, the most frequency word including **time**, **family**, **love**, **wife**, **husband**, **son**, **daughter** which are mostly related to the family so that we may can conclude that people who get married will have most happy moment with their family. While for people who did not get married, the most frequency words including **friend**, **watched**, **game**, **bought** are more likely can be described as less family stuff since watched something or games can also be done with their friends.
+
+
+### Gender: Parenthood vs No Parenthood
+
+The difference between **Parenthood People** and **No Parenthood people** are also very big.
+
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Parenthood_Word_Freq_Word_Cloud.png)![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/No_Parenthood_Word_Freq_Word_Cloud.png)
+
+Compared with both word frequency cloud, we can find that it is quite similiar to the difference between married people and not married people. For the parenthood people, the high frequency word such as **wife**, **husband**, **family** and so on are mostly related to the family so maybe they have joy when they spend time with their family. While for the no parenthood people, it is similiar to the no married people who may enjoy their life with their friends or doing something that they are interested in.
+
+
+\newline
+\newline
+\newline
+
+
+## Individual(Family Related) Activity or Group(Social) Activity
+
+After exploring the word frequency cloud for different group of people, we find that people have fun either with family(including themselves) or with other people(like friends or other people). So we want to compare the individual/family related activity or group(social) activity to find out which activity are most likely will bring happy moment for different people.
+
+Here we need to load the senselabel data for each happy moment from senselabel.csv in the data folder. Then we cluster the happy moment into two different groups by detecting the 
+
+
+
+
+
+
+
+
+
+
+

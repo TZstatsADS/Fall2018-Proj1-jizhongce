@@ -1,0 +1,358 @@
+---
+title: ''
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<center> <h1>Happy Monment Analysis</h1> </center>
+<center> <h2>Word frequency between different group of people. Group or Individual Activity. Category Heatmap. Difference between Verb and Noun</h2> </center>
+
+<center>By Zhongce Ji</center>
+
+\newline
+\newline
+\newline
+
+
+![](/Users/Tim/Desktop/Fall18/GR5243_ADS/Assignment1/Fall2018-Proj1-jizhongce/figs/Happy_Moment.png)
+
+There are many things will make people happy at specific moment in their life. Different group of people will have different perspectives of the happy moments, so for different people the causes of happy moment also differs in some way. So it is interesting to find out what will cause the people happy among different group of people, and let's compare how they are different from each other!
+
+\newline
+\newline
+\newline
+
+```{r Loading_Package, echo=FALSE, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+# Here Load packages
+library(tidyverse)
+library(tidytext)
+library(DT)
+library(scales)
+library(wordcloud2)
+library(gridExtra)
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(shiny)
+library(plotly)
+```
+
+```{r Read_Data, echo=FALSE, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+# Then load the data
+# First, we need to read the processed data from the processed_moments.csv
+hm_data <- read_csv("../output/processed_moments.csv")
+
+# Second, we read the demographic information
+demographic_data <- read_csv("../data/demographic.csv")
+
+Happy_Moment_Demographic_Data <- hm_data %>% inner_join(demographic_data, by = "wid")
+
+# Third, we read the senselabel information
+senselabel_data <- read_csv("../data/senselabel.csv")
+
+Happy_Moment_Senselabel_Data <- hm_data %>% inner_join(senselabel_data, by = "hmid") %>% inner_join(demographic_data, by = "wid")
+
+Happy_Moment_Demographic_Data <- Happy_Moment_Demographic_Data %>% filter(gender %in% c("m", "f")) %>% filter(marital %in% c("single", "married")) %>% filter(parenthood %in% c("n", "y")) %>% filter(reflection_period %in% c("24h", "3m")) %>% mutate(reflection_period = fct_recode(reflection_period, months_3 = "3m", hours_24 = "24h"))
+
+Happy_Moment_Senselabel_Data <- Happy_Moment_Senselabel_Data %>% filter(gender %in% c("m", "f")) %>% filter(marital %in% c("single", "married")) %>% filter(parenthood %in% c("n", "y")) %>% filter(reflection_period %in% c("24h", "3m")) %>% mutate(reflection_period = fct_recode(reflection_period, months_3 = "3m", hours_24 = "24h"))
+
+```
+
+
+First we take look at the frequency of the word for different group of people
+
+```{r Word_Frequency, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+# Female VS Male
+
+Female_Word_Freq <- filter(Happy_Moment_Demographic_Data, gender == "f") %>% unnest_tokens(word, text)
+
+Male_Word_Freq <- filter(Happy_Moment_Demographic_Data, gender == "m") %>% unnest_tokens(word, text)
+
+Female_Word_Freq <- Female_Word_Freq %>% dplyr::count(word, sort = TRUE)
+
+Male_Word_Freq <- Male_Word_Freq %>% dplyr::count(word, sort = TRUE)
+
+wordcloud2(Male_Word_Freq[1:20,], size = 0.3)
+
+wordcloud2(Female_Word_Freq[1:20,], size = 0.3)
+
+# Single VS Married
+
+Single_Word_Freq <- filter(Happy_Moment_Demographic_Data, marital == "single") %>% unnest_tokens(word, text)
+
+Married_Word_Freq <- filter(Happy_Moment_Demographic_Data, marital == "married") %>% unnest_tokens(word, text)
+
+Single_Word_Freq <- Single_Word_Freq %>% dplyr::count(word, sort = TRUE)
+
+Married_Word_Freq <- Married_Word_Freq %>% dplyr::count(word, sort = TRUE)
+
+wordcloud2(Single_Word_Freq[1:20,], size = 0.3)
+
+wordcloud2(Married_Word_Freq[1:20,], size = 0.3)
+
+# parenthood VS no Parenthood
+
+Parenthood_Word_Freq <- filter(Happy_Moment_Demographic_Data, parenthood == "y") %>% unnest_tokens(word, text)
+
+No_Parenthood_Word_Freq <- filter(Happy_Moment_Demographic_Data, parenthood == "n") %>% unnest_tokens(word, text)
+
+Parenthood_Word_Freq <- Parenthood_Word_Freq %>% dplyr::count(word, sort = TRUE)
+
+No_Parenthood_Word_Freq <- No_Parenthood_Word_Freq %>% dplyr::count(word, sort = TRUE)
+
+wordcloud2(Parenthood_Word_Freq[1:20,], size = 0.3)
+
+wordcloud2(No_Parenthood_Word_Freq[1:20,], size = 0.3)
+
+```
+
+
+
+
+
+
+
+Individual VS Group
+
+Next we take look at the group activity or individual activity. This can be done in the data set Happy_Moment_Senselabel_Data. There is a column which will contain the POS data which contain the PRON indicates the personal pronouns.
+
+```{r Individual_OR_Group, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+Happy_Moment_Senselabel_Data_Pron <- Happy_Moment_Senselabel_Data[Happy_Moment_Senselabel_Data$POS == "PRON",]
+
+# Next we need to create two list manually, including individual PRON and group PRON
+Individual_Term_Word <- c("^i$", "my", "you", "me", "yours", "myself", "your", "yourself")
+
+Group_Term_Word <- c("his", "he", "she", "her", "we", "our", "their", "they", "them", "themselves", "us", "himself", "herself", "ourself", "him")
+
+# Then we create function to check whether the given word list is a individual or is group
+# The way we decide it is any word list contian the group word will be consider group
+# If the word list only contain individual word then it is individual
+
+Individual_Group_List_Check <- function(Pron_List){
+  # Then we create a function to check whether the Pron is existed in the given word list
+  PRON_Exist_In_List <- function(PRON){
+    return(grepl(PRON, Pron_List))
+  }
+  
+  # TRUE means the word list contian the individual PRON
+  Individual_flag <- !all(sapply(Individual_Term_Word, PRON_Exist_In_List) == FALSE)
+  # TRUE means the word list contian the group PRON
+  Group_flag <- !all(sapply(Group_Term_Word, PRON_Exist_In_List) == FALSE)
+  
+  if(Group_flag == TRUE){
+    return("Group")
+  }
+  
+  else{
+    return("Individual")
+  }
+  
+}
+
+# Then we create a function which can used to apply to list of id
+Individual_Group_ID_Check <- function(hmid){
+  Word_list <- Happy_Moment_Senselabel_Data_Pron[Happy_Moment_Senselabel_Data_Pron$hmid == hmid, "lowercaseLemma"]
+  return(Individual_Group_List_Check(Word_list))
+}
+
+# Then we create a function for specific dataset
+Individual_Group_Data_Check <- function(Data){
+  
+  hmid_list <- unique(Data$hmid)
+  
+  # Then return the data frame
+  
+  return(data.frame(hmid = hmid_list, Group_OR_Individual = sapply(hmid_list, Individual_Group_ID_Check)))
+  
+}
+
+
+# hm_data <- hm_data %>% inner_join(Individual_Group_Data_Check(hm_data), by = "hmid")
+
+# write_csv(hm_data, "../output/Happy_Moment_Processed_Data.csv")
+
+hm_data <- read_csv("../output/Happy_Moment_Processed_Data.csv")
+
+Happy_Moment_New_Demographic_Data <- hm_data %>% inner_join(demographic_data, by = "wid") %>% filter(gender %in% c("m", "f")) %>% filter(marital %in% c("single", "married")) %>% filter(parenthood %in% c("n", "y")) %>% filter(reflection_period %in% c("24h", "3m")) %>% mutate(reflection_period = fct_recode(reflection_period, months_3 = "3m", hours_24 = "24h"))
+
+Happy_Moment_New_Demographic_Data$Group_OR_Individual <- as.character(Happy_Moment_New_Demographic_Data$Group_OR_Individual)
+
+ggplot(Happy_Moment_New_Demographic_Data, aes(marital)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
+
+ggplot(Happy_Moment_New_Demographic_Data, aes(gender)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
+
+ggplot(Happy_Moment_New_Demographic_Data, aes(parenthood)) + geom_bar(aes(fill = Group_OR_Individual), position = position_stack(reverse = TRUE)) +  coord_flip() + theme(legend.position = "top") + scale_fill_discrete(name = "Group or Individual")
+
+
+```
+
+
+
+Different in Category heat map
+
+```{r Category_Heat_Map, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+# Here we create a function which we can use to create different matrix for heat map
+# Here we do the matrix for gender
+Happy_Moment_Heat_Map_gender_Data <- Happy_Moment_New_Demographic_Data[, c("gender","predicted_category")]
+
+Happy_Moment_Gender_Counts <- ddply(Happy_Moment_Heat_Map_gender_Data, .(Happy_Moment_Heat_Map_gender_Data$gender, Happy_Moment_Heat_Map_gender_Data$predicted_category), nrow)
+  
+colnames(Happy_Moment_Gender_Counts) <- c("gender", "category", "count")
+  
+category <- unique(Happy_Moment_Heat_Map_gender_Data$predicted_category)
+  
+gender <- unique(Happy_Moment_Heat_Map_gender_Data$gender)
+  
+Happy_Moment_Heap_Map_Gender_Matrix <- matrix(nrow = length(category), ncol = length(gender))
+  
+for (i in c(1:length(category))) {
+  
+  for (j in c(1:length(gender))) {
+    
+    Happy_Moment_Heap_Map_Gender_Matrix[i,j] = Happy_Moment_Gender_Counts[Happy_Moment_Gender_Counts$gender == gender[j] & Happy_Moment_Gender_Counts$category == category[i], "count" ]
+    
+  }
+  
+}
+
+rownames(Happy_Moment_Heap_Map_Gender_Matrix) <- category
+
+colnames(Happy_Moment_Heap_Map_Gender_Matrix) <- gender
+
+library(d3heatmap)
+
+d3heatmap(Happy_Moment_Heap_Map_Gender_Matrix)
+
+
+
+# Here we do the matrix for gender
+Happy_Moment_Heat_Map_marital_Data <- Happy_Moment_New_Demographic_Data[, c("marital","predicted_category")]
+
+Happy_Moment_marital_Counts <- ddply(Happy_Moment_Heat_Map_marital_Data, .(Happy_Moment_Heat_Map_marital_Data$marital, Happy_Moment_Heat_Map_marital_Data$predicted_category), nrow)
+  
+colnames(Happy_Moment_marital_Counts) <- c("marital", "category", "count")
+  
+category <- unique(Happy_Moment_Heat_Map_marital_Data$predicted_category)
+  
+marital <- unique(Happy_Moment_Heat_Map_marital_Data$marital)
+  
+Happy_Moment_Heap_Map_Marital_Matrix <- matrix(nrow = length(category), ncol = length(marital))
+  
+for (i in c(1:length(category))) {
+  
+  for (j in c(1:length(marital))) {
+    
+    Happy_Moment_Heap_Map_Marital_Matrix[i,j] = Happy_Moment_marital_Counts[Happy_Moment_marital_Counts$marital == marital[j] & Happy_Moment_marital_Counts$category == category[i], "count" ]
+    
+  }
+  
+}
+
+rownames(Happy_Moment_Heap_Map_Marital_Matrix) <- category
+
+colnames(Happy_Moment_Heap_Map_Marital_Matrix) <- marital
+
+library(d3heatmap)
+
+d3heatmap(Happy_Moment_Heap_Map_Marital_Matrix)
+
+
+# Here we do the matrix for parenthood
+Happy_Moment_Heat_Map_parenthood_Data <- Happy_Moment_New_Demographic_Data[, c("parenthood","predicted_category")]
+
+Happy_Moment_parenthood_Counts <- ddply(Happy_Moment_Heat_Map_parenthood_Data, .(Happy_Moment_Heat_Map_parenthood_Data$parenthood, Happy_Moment_Heat_Map_parenthood_Data$predicted_category), nrow)
+  
+colnames(Happy_Moment_parenthood_Counts) <- c("parenthood", "category", "count")
+  
+category <- unique(Happy_Moment_Heat_Map_parenthood_Data$predicted_category)
+  
+parenthood <- unique(Happy_Moment_Heat_Map_parenthood_Data$parenthood)
+  
+Happy_Moment_Heap_Map_Parenthood_Matrix <- matrix(nrow = length(category), ncol = length(parenthood))
+  
+for (i in c(1:length(category))) {
+  
+  for (j in c(1:length(parenthood))) {
+    
+    Happy_Moment_Heap_Map_Parenthood_Matrix[i,j] = Happy_Moment_parenthood_Counts[Happy_Moment_parenthood_Counts$parenthood == parenthood[j] & Happy_Moment_parenthood_Counts$category == category[i], "count" ]
+    
+  }
+  
+}
+
+rownames(Happy_Moment_Heap_Map_Parenthood_Matrix) <- category
+
+colnames(Happy_Moment_Heap_Map_Parenthood_Matrix) <- parenthood
+
+library(d3heatmap)
+
+d3heatmap(Happy_Moment_Heap_Map_Parenthood_Matrix)
+
+
+```
+
+
+Then take look at the verb or noun
+
+```{r Verb_Noun, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
+# verb supersense label
+Super_Sense_Label_Index <- which(is.na(Happy_Moment_Senselabel_Data$supersenseLabel) == FALSE )
+
+Happy_Moment_Super_Sense_Data <- Happy_Moment_Senselabel_Data[Super_Sense_Label_Index, ]
+# Then take the verb
+Happy_Moment_Super_Sense_Verb_Data <- Happy_Moment_Super_Sense_Data[Happy_Moment_Super_Sense_Data$POS == "VERB", ]
+
+# Then take the noun
+Happy_Moment_Super_Sense_Noun_Data <- Happy_Moment_Super_Sense_Data[Happy_Moment_Super_Sense_Data$POS == "NOUN", ]
+
+# This for gender
+Happy_Moment_Super_Sense_Verb_Gender_Counts <- ddply(Happy_Moment_Super_Sense_Verb_Data, .(Happy_Moment_Super_Sense_Verb_Data$gender, Happy_Moment_Super_Sense_Verb_Data$supersenseLabel), nrow)
+
+colnames(Happy_Moment_Super_Sense_Verb_Gender_Counts) <- c("gender", "supersenseLabel", "count")
+
+Happy_Moment_Super_Sense_Noun_Gender_Counts <- ddply(Happy_Moment_Super_Sense_Noun_Data, .(Happy_Moment_Super_Sense_Noun_Data$gender, Happy_Moment_Super_Sense_Noun_Data$supersenseLabel), nrow)
+
+colnames(Happy_Moment_Super_Sense_Noun_Gender_Counts) <- c("gender", "supersenseLabel", "count")
+
+ggplot(Happy_Moment_Super_Sense_Verb_Gender_Counts, aes(x = gender, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
+
+ggplot(Happy_Moment_Super_Sense_Noun_Gender_Counts, aes(x = gender, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
+
+
+
+# This for marital
+Happy_Moment_Super_Sense_Verb_Marital_Counts <- ddply(Happy_Moment_Super_Sense_Verb_Data, .(Happy_Moment_Super_Sense_Verb_Data$marital, Happy_Moment_Super_Sense_Verb_Data$supersenseLabel), nrow)
+
+colnames(Happy_Moment_Super_Sense_Verb_Marital_Counts) <- c("marital", "supersenseLabel", "count")
+
+Happy_Moment_Super_Sense_Noun_Marital_Counts <- ddply(Happy_Moment_Super_Sense_Noun_Data, .(Happy_Moment_Super_Sense_Noun_Data$marital, Happy_Moment_Super_Sense_Noun_Data$supersenseLabel), nrow)
+
+colnames(Happy_Moment_Super_Sense_Noun_Marital_Counts) <- c("marital", "supersenseLabel", "count")
+
+ggplot(Happy_Moment_Super_Sense_Verb_Marital_Counts, aes(x = marital, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
+
+ggplot(Happy_Moment_Super_Sense_Noun_Marital_Counts, aes(x = marital, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
+
+
+
+# This for parenthood Parenthood
+Happy_Moment_Super_Sense_Verb_Parenthood_Counts <- ddply(Happy_Moment_Super_Sense_Verb_Data, .(Happy_Moment_Super_Sense_Verb_Data$parenthood, Happy_Moment_Super_Sense_Verb_Data$supersenseLabel), nrow)
+
+colnames(Happy_Moment_Super_Sense_Verb_Parenthood_Counts) <- c("parenthood", "supersenseLabel", "count")
+
+Happy_Moment_Super_Sense_Noun_Parenthood_Counts <- ddply(Happy_Moment_Super_Sense_Noun_Data, .(Happy_Moment_Super_Sense_Noun_Data$parenthood, Happy_Moment_Super_Sense_Noun_Data$supersenseLabel), nrow)
+
+colnames(Happy_Moment_Super_Sense_Noun_Parenthood_Counts) <- c("parenthood", "supersenseLabel", "count")
+
+ggplot(Happy_Moment_Super_Sense_Verb_Parenthood_Counts, aes(x = parenthood, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
+
+ggplot(Happy_Moment_Super_Sense_Noun_Parenthood_Counts, aes(x = parenthood, y = count, colour=supersenseLabel, label = supersenseLabel)) + geom_point() + scale_fill_discrete(name = "Supersense Label") + geom_text(hjust=0, vjust=0)
+
+```
+
+
