@@ -23,17 +23,15 @@ There are many things will make people happy at specific moment in their life. D
 
 ```{r Loading_Package, echo=FALSE, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
 # Here Load packages
-library(tidyverse)
-library(tidytext)
-library(DT)
-library(scales)
-library(wordcloud2)
-library(gridExtra)
-library(ggplot2)
-library(plyr)
-library(dplyr)
-library(shiny)
-library(plotly)
+Packages <- c("tidyverse", "tidytext", "DT", "scales", "wordcloud2", "gridExtra", "ggplot2", "plyr", "dplyr")
+
+for (package in Packages) {
+  if(package %in% rownames(installed.packages()) == FALSE){
+    install.packages(package)
+  }
+}
+
+lapply(Packages, library, character.only = TRUE)
 ```
 
 ```{r Read_Data, echo=FALSE, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
