@@ -23,11 +23,11 @@ There are many things will make people happy at specific moment in their life. D
 
 ```{r Loading_Package, echo=FALSE, results='hide', message=FALSE, warning=FALSE, fig.show = 'hide'}
 # Here Load packages
-Packages <- c("tidyverse", "tidytext", "DT", "scales", "wordcloud2", "gridExtra", "ggplot2", "plyr", "dplyr")
+Packages <- c("tidyverse", "tidytext", "DT", "scales", "wordcloud2", "gridExtra", "ggplot2", "plyr", "dplyr", "d3heatmap")
 
 for (package in Packages) {
   if(package %in% rownames(installed.packages()) == FALSE){
-    install.packages(package)
+    install.packages(package, repos = "http://cran.us.r-project.org")
   }
 }
 
@@ -287,8 +287,6 @@ rownames(Happy_Moment_Heap_Map_Gender_Matrix) <- category
 
 colnames(Happy_Moment_Heap_Map_Gender_Matrix) <- gender
 
-library(d3heatmap)
-
 d3heatmap(Happy_Moment_Heap_Map_Gender_Matrix)
 
 
@@ -320,8 +318,6 @@ rownames(Happy_Moment_Heap_Map_Marital_Matrix) <- category
 
 colnames(Happy_Moment_Heap_Map_Marital_Matrix) <- marital
 
-library(d3heatmap)
-
 d3heatmap(Happy_Moment_Heap_Map_Marital_Matrix)
 
 
@@ -351,8 +347,6 @@ for (i in c(1:length(category))) {
 rownames(Happy_Moment_Heap_Map_Parenthood_Matrix) <- category
 
 colnames(Happy_Moment_Heap_Map_Parenthood_Matrix) <- parenthood
-
-library(d3heatmap)
 
 d3heatmap(Happy_Moment_Heap_Map_Parenthood_Matrix)
 
